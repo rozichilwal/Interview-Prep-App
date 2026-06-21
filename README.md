@@ -35,8 +35,8 @@ A full-stack web application designed to help job seekers prepare for interviews
 
 1. **Clone the repository:**
    ```bash
-   git clone <repo-url>
-   cd "Resume analyzer"
+   git clone https://github.com/rozichilwal/Interview-prep-app
+   cd "Interview-Prep-App"
    ```
 
 2. **Setup the Backend:**
