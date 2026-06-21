@@ -1,4 +1,4 @@
-# AI Interview Plan Generator & Resume Analyzer
+# Interview Prep App
 
 A full-stack web application designed to help job seekers prepare for interviews by generating customized, AI-driven interview strategies based on a target job description and the candidate's profile/resume.
 
