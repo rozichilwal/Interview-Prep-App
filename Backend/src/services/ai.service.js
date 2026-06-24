@@ -39,6 +39,46 @@ const interviewReportSchema = z.object({
 })
 
 
+function generatePartialReportFallback(resume, jobDescription) {
+    // Basic text matching logic
+    const resumeLower = resume.toLowerCase();
+    const jobDescLower = jobDescription.toLowerCase();
+    
+    // Extracted some dummy skills to check
+    const commonSkills = ["react", "node", "javascript", "python", "java", "c++", "docker", "kubernetes", "aws", "azure", "gcp", "sql", "mongodb", "express", "typescript", "html", "css", "machine learning", "data science", "api", "git", "ci/cd"];
+    
+    let matchCount = 0;
+    let totalSkillsFoundInJob = 0;
+    const skillGaps = [];
+
+    commonSkills.forEach(skill => {
+        if (jobDescLower.includes(skill)) {
+            totalSkillsFoundInJob++;
+            if (resumeLower.includes(skill)) {
+                matchCount++;
+            } else {
+                skillGaps.push({
+                    skill: skill,
+                    severity: "medium"
+                });
+            }
+        }
+    });
+
+    const matchScore = totalSkillsFoundInJob === 0 ? 50 : Math.round((matchCount / totalSkillsFoundInJob) * 100);
+
+    return {
+        title: "Partial Report (AI Unavailable)",
+        matchScore,
+        technicalQuestions: [],
+        behavioralQuestions: [],
+        skillGaps: skillGaps.slice(0, 5), // return max 5 gaps
+        preparationPlan: [],
+        isPartial: true,
+        message: "Interview questions are not available temporarily due to high AI model traffic."
+    };
+}
+
 async function generateInterviewReport({ resume, selfDescription, jobDescription }) {
 
 const prompt = `
@@ -75,7 +115,7 @@ Example format:
 
   "preparationPlan":[
     {
-      "day":"1",
+      "day":1,
       "focus":"React",
       "tasks":["Study hooks","Build mini project"]
     }
@@ -92,19 +132,50 @@ Job Description:
 ${jobDescription}
 `;
 
-    const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-            responseMimeType: "application/json",
-            // responseSchema: zodToJsonSchema(interviewReportSchema),
+    const modelsToTry = [
+        { provider: 'google', model: 'gemini-2.5-flash' },
+        { provider: 'google', model: 'gemini-2.0-flash' },
+        { provider: 'groq', model: 'llama-3.3-70b-versatile' }
+    ];
+
+    for (const modelInfo of modelsToTry) {
+        try {
+            if (modelInfo.provider === 'google') {
+                const response = await ai.models.generateContent({
+                    model: modelInfo.model,
+                    contents: prompt,
+                    config: {
+                        responseMimeType: "application/json",
+                    }
+                });
+                return JSON.parse(response.text);
+            } else if (modelInfo.provider === 'groq') {
+                if (!process.env.GROQ_API_KEY) {
+                    console.warn("GROQ_API_KEY not found, skipping Groq model.");
+                    continue;
+                }
+                const Groq = require('groq-sdk');
+                const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+                const chatCompletion = await groq.chat.completions.create({
+                    messages: [
+                        {
+                            role: "user",
+                            content: prompt,
+                        }
+                    ],
+                    model: modelInfo.model,
+                    response_format: { type: "json_object" }
+                });
+                return JSON.parse(chatCompletion.choices[0].message.content);
+            }
+        } catch (error) {
+            console.error(`Error with model ${modelInfo.model}:`, error.message);
+            // continue to next model
         }
-    })
+    }
 
-    
-    return JSON.parse(response.text)
-
-
+    console.log("All models failed, returning partial data.");
+    return generatePartialReportFallback(resume, jobDescription);
 }
 
 

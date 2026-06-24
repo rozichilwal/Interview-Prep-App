@@ -85,6 +85,11 @@ const Interview = () => {
 
     return (
         <div className='interview-page'>
+            {report.isPartial && (
+                <div className='partial-warning' style={{ backgroundColor: '#fff3cd', color: '#856404', padding: '15px', textAlign: 'center', fontWeight: 'bold', borderBottom: '1px solid #ffeeba' }}>
+                    ⚠️ {report.message || "Interview questions are temporarily not available because AI model is having high traffic."}
+                </div>
+            )}
             <div className='interview-layout'>
 
                 {/* ── Left Nav ── */}

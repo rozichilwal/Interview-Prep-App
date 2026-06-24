@@ -11,6 +11,21 @@ async function generateInterViewReportController(req,res) {
     const resumeContent = await (new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText()
     const { selfDescription, jobDescription}  =req.body
 
+    // Cache Check
+    const existingReport = await interviewReportModel.findOne({
+        user: req.user.id,
+        resume: resumeContent.text,
+        selfDescription,
+        jobDescription
+    });
+
+    if (existingReport) {
+        return res.status(200).json({
+            message: "Interview report retrieved from cache successfully",
+            interviewReport: existingReport
+        });
+    }
+
     const interViewReportByAi = await generateInterviewReport({
         resume: resumeContent.text,
         selfDescription,
@@ -18,7 +33,7 @@ async function generateInterViewReportController(req,res) {
     })
 
     const interviewReport = await interviewReportModel.create({
-        title: "Interview Preparation Report",
+        title: interViewReportByAi.title || "Interview Preparation Report",
         user : req.user.id,
         resume: resumeContent.text,
         selfDescription,
@@ -27,7 +42,7 @@ async function generateInterViewReportController(req,res) {
     })
 
     res.status(201).json({
-        message:"Interview report generated successfully",
+        message: interViewReportByAi.isPartial ? interViewReportByAi.message : "Interview report generated successfully",
         interviewReport
     })
 }

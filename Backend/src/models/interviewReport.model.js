@@ -98,6 +98,13 @@ const interviewReportSchema = new mongoose.Schema({
     title:{
         type : String,
         required :[true,"Job title is required"]
+    },
+    isPartial: {
+        type: Boolean,
+        default: false
+    },
+    message: {
+        type: String
     }
 
 },{
