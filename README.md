@@ -1,72 +1,60 @@
-# Interview Prep App
+# AI Interview Prep & Resume Analyzer
 
-A full-stack web application designed to help job seekers prepare for interviews by generating customized, AI-driven interview strategies based on a target job description and the candidate's profile/resume.
+Hey! 👋 Welcome to my AI-powered interview prep app. I built this because getting ready for interviews is hard enough without having to guess what questions they'll actually ask you. This project takes a target job description and your resume (or just a quick blurb about your experience), and uses AI to generate tailored technical questions, behavioral questions, and a custom learning roadmap. 
 
-## Features
-
-- **User Authentication**: Secure signup and login flow with JWT and HTTP-only cookies.
-- **Custom Interview Plans**: Paste a job description and upload a resume (or write a self-description) to generate targeted technical questions, behavioral questions, and a learning roadmap.
-- **AI-Powered Analysis**: Utilizes AI services in the backend to deeply analyze the match between the resume and job requirements.
-- **Modern UI**: A responsive, dark-themed user interface built with React and Sass.
-- **History & Reports**: Saves past generated interview reports to your personal dashboard so you can review them later.
+## What it does
+- **Custom Interview Strategies:** Paste the job description, upload your resume (PDF), and get incredibly targeted prep materials.
+- **AI-Powered Analysis:** Uses Google Gemini (and Groq/Llama as fallbacks) to do a deep dive on how well your resume matches the job requirements.
+- **Dashboard & History:** All your generated interview reports are saved to your personal dashboard so you can review them whenever you want.
+- **Secure Authentication:** Standard JWT login flow with HTTP-only cookies to keep your session secure.
 
 ## Tech Stack
+I built this project using a modern JS stack:
+- **Frontend:** React 18 with Vite, heavily styled using vanilla Sass. It features a responsive, sleek dark theme.
+- **Backend:** Node.js & Express.
+- **Database:** MongoDB & Mongoose for handling users, auth tokens, and saving interview reports.
+- **AI Integrations:** `@google/genai` and `groq-sdk` for the heavy LLM lifting.
+- **Other cool stuff:** `pdf-parse` for reading those uploaded resumes and `puppeteer` (just in case we need to fetch live data!).
 
-### Frontend
-- React 18 (Vite)
-- Sass for styling
-- React Router DOM
-- Axios for API requests
+## How to run it locally
 
-### Backend
-- Node.js & Express.js
-- MongoDB & Mongoose (for Users, Tokens, and Interview Reports)
-- JSON Web Tokens (JWT) & bcryptjs for Authentication
-- Google Gemini AI / LLM APIs for generating content
+If you want to spin this up yourself and play around with the code, here's how:
 
-## Getting Started
+### 1. Clone the repo
+```bash
+git clone https://github.com/rozichilwal/Interview-prep-app
+cd Interview-Prep-App
+```
 
-### Prerequisites
-- Node.js (v16+)
-- MongoDB connection string (Atlas or Local)
-- AI API Key (e.g. Google Gemini)
+### 2. Set up the Backend
+```bash
+cd Backend
+npm install
+```
+You'll need a `.env` file in the `Backend` folder. Go ahead and create one with these variables:
+```env
+MONGO_URL=your_mongodb_connection_string
+JWT_SECRET=your_super_secret_jwt_key
+GOOGLE_GENAI_API_KEY=your_gemini_api_key
+GROQ_API_KEY=your_groq_api_key # Used as a fallback if Gemini is busy
+```
+Then start the development server:
+```bash
+npm run dev
+```
 
-### Installation
+### 3. Set up the Frontend
+Open up a new terminal tab and run:
+```bash
+cd Frontend
+npm install
+npm run dev
+```
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/rozichilwal/Interview-prep-app
-   cd "Interview-Prep-App"
-   ```
+The frontend will start running on `http://localhost:5173`. I've set up the Vite proxy to automatically route `/api` requests to the backend, so you don't have to deal with annoying CORS errors during development!
 
-2. **Setup the Backend:**
-   ```bash
-   cd Backend
-   npm install
-   ```
-   Create a `.env` file in the `Backend` directory with your environment variables:
-   ```env
-   MONGO_URL=your_mongodb_connection_string
-   JWT_SECRET=your_super_secret_jwt_key
-   GOOGLE_GENAI_API_KEY=your_gemini_api_key
-   ```
-   Run the backend development server:
-   ```bash
-   npm run dev
-   ```
+## Security 
+Just a quick heads-up: make sure you never commit your `.env` file or any API keys. The `.gitignore` is already set up to catch it, but it's always good to be careful.
 
-3. **Setup the Frontend:**
-   ```bash
-   cd ../Frontend
-   npm install
-   ```
-   Run the frontend development server:
-   ```bash
-   npm run dev
-   ```
-
-4. **Open in Browser:**
-   Navigate to `http://localhost:5173` in your browser. The Vite proxy is automatically configured to forward `/api` requests to the backend server.
-
-## Security Note
-This project contains a properly configured `.gitignore` that ensures sensitive files like `.env` and `node_modules` are excluded from version control. Never commit your API keys or database passwords to GitHub!
+---
+Feel free to poke around the code, use it to crush your next interview, or submit PRs if you have ideas on how to make it better!
