@@ -1,26 +1,33 @@
-import {createBrowserRouter} from "react-router";
-import Login from "./feature/auth/pages/Login";
-import Register from "./feature/auth/pages/Register";
+import { createBrowserRouter } from "react-router";
+import { lazy, Suspense } from "react";
 import Protected from "./feature/auth/components/Protected";
-import Home from "./feature/interview/pages/Home";
-import Interview from "./feature/interview/pages/Interview";
 
+const Login = lazy(() => import("./feature/auth/pages/Login"));
+const Register = lazy(() => import("./feature/auth/pages/Register"));
+const Home = lazy(() => import("./feature/interview/pages/Home"));
+const Interview = lazy(() => import("./feature/interview/pages/Interview"));
+
+const SuspenseWrapper = ({ children }) => (
+    <Suspense fallback={<main className='loading-screen'><h1>Loading...</h1></main>}>
+        {children}
+    </Suspense>
+);
 
 export const router = createBrowserRouter([
     {
-        path:"/login",
-        element:<Login/>
+        path: "/login",
+        element: <SuspenseWrapper><Login /></SuspenseWrapper>
     },
     {
-        path:"/register",
-        element:<Register/>
+        path: "/register",
+        element: <SuspenseWrapper><Register /></SuspenseWrapper>
     },
-     {
+    {
         path: "/",
-        element: <Protected><Home /></Protected>
+        element: <Protected><SuspenseWrapper><Home /></SuspenseWrapper></Protected>
     },
     {
-        path:"/interview/:interviewId",
-        element: <Protected><Interview /></Protected>
+        path: "/interview/:interviewId",
+        element: <Protected><SuspenseWrapper><Interview /></SuspenseWrapper></Protected>
     }
 ])
